@@ -1,0 +1,79 @@
+#!/bin/bash
+
+VERSION="1.0.0"
+
+# Path resolver
+SCRIPT_PATH=$(realpath "${BASH_SOURCE[0]:-${(%):-%N}}")
+SCRIPT_DIR=$(dirname "$SCRIPT_PATH")
+ROOT_DIR=$(dirname "$SCRIPT_DIR")
+
+source "$ROOT_DIR/ai/query.sh"
+source "$ROOT_DIR/ai/format.sh"
+
+# Handle flags
+if [[ "$1" == "--help" || "$1" == "-h" ]]; then
+  echo "🧠 AI Terminal Debugger v$VERSION"
+  echo ""
+  echo "Usage:"
+  echo "  ai-terminal <command> [args...]"
+  echo ""
+  echo "Examples:"
+  echo "  ai-terminal ls /nonexistent"
+  echo ""
+  echo "Options:"
+  echo "  -h, --help     Show this help message"
+  echo "  -v, --version  Show version information"
+  echo ""
+  echo "For OpenAI API, set OPENAI_API_KEY in your shell or macOS Keychain."
+  echo "Fallback to Ollama if no API key found."
+  exit 0
+fi
+
+if [[ "$1" == "--version" || "$1" == "-v" ]]; then
+  echo "AI Terminal Debugger v$VERSION"
+  exit 0
+fi
+
+# Dependency checks
+if ! command -v jq >/dev/null 2>&1; then
+  echo "❌ jq not found. Install with: brew install jq"
+  exit 1
+fi
+
+if ! command -v realpath >/dev/null 2>&1; then
+  echo "❌ realpath not found. Install with: brew install coreutils"
+  exit 1
+fi
+
+# Capture command + output
+command="$1"
+shift
+args="$@"
+output=$( { eval "$command $args"; echo $? > /tmp/ai_terminal_exitcode; } 2>&1 )
+status=$(cat /tmp/ai_terminal_exitcode)
+
+response=$(query_ai "$command $args" "$status" "$output")
+suggestion=$(echo "$response" | jq -r '.choices[0].message.content // empty')
+
+if [ -z "$suggestion" ]; then
+  echo "❌ AI Error: No valid response."
+  echo "$response"
+  exit 1
+fi
+
+format_output "$suggestion"
+
+# Auto-execute commands
+run_commands=$(echo "$suggestion" | grep '^## RUN:' | sed 's/^## RUN: //')
+if [ -n "$run_commands" ]; then
+  echo -n "Execute these commands? [y/N]: "
+  read -r answer
+  if [[ "$answer" =~ ^[Yy]$ ]]; then
+    echo "$run_commands" | while IFS= read -r cmd; do
+      echo -e "\033[1;32m⚡ Running: $cmd\033[0m"
+      eval "$cmd"
+    done
+  else
+    echo "❌ Skipped."
+  fi
+fi
