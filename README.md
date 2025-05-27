@@ -25,45 +25,45 @@ Just run your command through `ai-terminal`, and it will:
 
 ### 1️⃣ Clone the repository
 
-\`\`\`bash
+```bash
 git clone https://github.com/yourusername/ai-terminal.git
 cd ai-terminal
-\`\`\`
+```
 
 ### 2️⃣ Install dependencies (macOS)
 
 This tool requires:
 
-- [\`jq\`](https://stedolan.github.io/jq/) (for JSON parsing)
-- [\`coreutils\`](https://formulae.brew.sh/formula/coreutils) (for \`realpath\` on macOS)
+- [`jq`](https://stedolan.github.io/jq/) (for JSON parsing)
+- [`coreutils`](https://formulae.brew.sh/formula/coreutils) (for `realpath` on macOS)
 
 Install both using Homebrew:
 
-\`\`\`bash
+```bash
 brew install jq coreutils
-\`\`\`
+```
 
 ### 3️⃣ Run the installer
 
-\`\`\`bash
+```bash
 bash install.sh
-\`\`\`
+```
 
 ### 4️⃣ Set up your OpenAI API key
 
 Get your API key from [OpenAI](https://platform.openai.com/api-keys) and either:
 
-- Add it to your \`~/.zshrc\` or \`~/.bashrc\`:
+- Add it to your `~/.zshrc` or `~/.bashrc`:
 
-\`\`\`bash
+```bash
 export OPENAI_API_KEY=sk-...
-\`\`\`
+```
 
 Or store it in your **macOS Keychain**:
 
-\`\`\`bash
+```bash
 security add-generic-password -a "$USER" -s "OpenAI_API_Key" -w "sk-..."
-\`\`\`
+```
 
 Alternatively, install [Ollama](https://ollama.com) for local model support.  
 If no OpenAI API key is found, the tool will try using Ollama.
@@ -72,23 +72,23 @@ If no OpenAI API key is found, the tool will try using Ollama.
 
 ## 🖥️ Usage
 
-Run any terminal command through \`ai-terminal\`:
+Run any terminal command through `ai-terminal`:
 
-\`\`\`bash
+```bash
 ai-terminal <your-command>
-\`\`\`
+```
 
 Example:
 
-\`\`\`bash
+```bash
 ai-terminal ls /nonexistent
-\`\`\`
+```
 
 ---
 
 ## 🎨 Sample Output
 
-\`\`\`bash
+```bash
 💡 AI Suggestion:
 Likely Cause
   The directory /nonexistent does not exist.
@@ -102,15 +102,15 @@ Step-by-Step Fix Suggestions
 
 3. Check the directory
   ⚙️ Command: ls /nonexistent
-\`\`\`
+```
 
 ---
 
 ## 🛡️ Security
 
 ✅ AI-suggested commands are **not auto-executed**—you must confirm.  
-✅ The tool avoids suggesting dangerous commands like \`rm -rf\`.  
-✅ Future: Add a \`safe_run.sh\` module for extra protection.
+✅ The tool avoids suggesting dangerous commands like `rm -rf`.  
+✅ Future: Add a `safe_run.sh` module for extra protection.
 
 ---
 
